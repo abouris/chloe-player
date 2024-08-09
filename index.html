@@ -1,0 +1,423 @@
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Futuristic Music Player</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+  :root {
+    --primary-color: #00ffff;
+    --secondary-color: #ff00ff;
+    --background-color: #0a0a1e;
+    --surface-color: #1a1a3a;
+  }
+
+  body {
+    font-family: 'Orbitron', sans-serif;
+    background-color: var(--background-color);
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  .player-container {
+    background-color: var(--surface-color);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(255, 0, 255, 0.1);
+    width: 400px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .player-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg 340deg,
+      var(--primary-color) 340deg 360deg
+    );
+    animation: rotate 10s linear infinite;
+    z-index: -1;
+  }
+
+  @keyframes rotate {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .player-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .player-header h2 {
+    font-size: 2em;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin: 0;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .btn {
+    background-color: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .btn:hover {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    box-shadow: 0 0 15px var(--primary-color);
+  }
+
+  .btn svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  
+  .progress {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transition: width 0.1s linear;
+    position: relative;
+  }
+
+  .progress::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  }
+  
+  .song-info {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .song-info p {
+    font-size: 1.2em;
+    margin: 0;
+  }
+  
+  .song-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+
+  .song-list::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .song-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .song-list::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 5px;
+  }
+  
+  .song-item {
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .song-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+  }
+  
+  .active-song {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: var(--background-color);
+    font-weight: bold;
+  }
+
+  .volume-control {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .volume-icon {
+    margin-right: 10px;
+    color: var(--primary-color);
+  }
+
+  .volume-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+  }
+
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .volume-slider::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 10px var(--primary-color);
+  }
+
+  .equalizer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 50px;
+    margin-bottom: 20px;
+  }
+
+  .eq-bar {
+    width: 5px;
+    background-color: var(--primary-color);
+    transition: height 0.2s ease;
+  }
+</style>
+<script type="text/javascript" nonce="3ef5692b142a4420908a6375302" src="//local.adguard.org?ts=1723064496692&amp;type=content-script&amp;dmn=party.websim.ai&amp;url=https%3A%2F%2Fparty.websim.ai%2Fapi%2Fv1%2Fsites%2FH8FCaDRYvfKcyuJY3%2Fhtml%3Fraw%3Dtrue&amp;app=com.google.Chrome&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script>
+<script type="text/javascript" nonce="3ef5692b142a4420908a6375302" src="//local.adguard.org?ts=1723064496692&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;type=user-script"></script></head>
+<body>
+  <div class="player-container">
+    <div class="player-header">
+      <h2>Chloe's animal stories music</h2>
+    </div>
+    <div class="equalizer" id="equalizer">
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+    </div>
+    <div class="controls">
+      <button class="btn" id="prevBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="19 20 9 12 19 4 19 20"></polygon>
+          <line x1="5" y1="19" x2="5" y2="5"></line>
+        </svg>
+      </button>
+      <button class="btn" id="playPauseBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+      </button>
+      <button class="btn" id="nextBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 4 15 12 5 20 5 4"></polygon>
+          <line x1="19" y1="5" x2="19" y2="19"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="progress-bar">
+      <div class="progress" id="progress"></div>
+    </div>
+    <div class="song-info">
+      <p id="currentSong">Select a song to play</p>
+      <p id="currentTime">00:00 / 00:00</p>
+    </div>
+    <div class="song-list" id="songList"></div>
+    <div class="volume-control">
+      <svg class="volume-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+      </svg>
+      <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+    </div>
+  </div>
+
+  <script>
+    const songs = [
+      { title: "Dog and Elephant friends", src: "music/Dog_and_Elephant_friends.mp3" },
+      { title: "Koala bored", src: "music/Koala_bored.mp3" },
+      { title: "Monkey play", src: "music/Monkey_play.mp3" },
+      { title: "Moose Who Loved Music", src: "music/Moose_Who_Loved_Music.mp3" },
+      { title: "Mouse traveller", src: "music/Mouse_traveller.mp3" },
+      { title: "Tiger to fly", src: "music/Tiger_to_fly.mp3" },
+    ];
+
+    let currentSongIndex = 0;
+    let isPlaying = false;
+    const audio = new Audio();
+
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const progress = document.getElementById('progress');
+    const currentSongElement = document.getElementById('currentSong');
+    const currentTimeElement = document.getElementById('currentTime');
+    const songList = document.getElementById('songList');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const equalizer = document.getElementById('equalizer');
+
+    function loadSong(index) {
+      const song = songs[index];
+      audio.src = song.src;
+      currentSongElement.textContent = song.title;
+      highlightActiveSong();
+    }
+
+    function playSong() {
+      isPlaying = true;
+      audio.play();
+      updatePlayPauseButton();
+      startEqualizer();
+    }
+
+    function pauseSong() {
+      isPlaying = false;
+      audio.pause();
+      updatePlayPauseButton();
+      stopEqualizer();
+    }
+
+    function updatePlayPauseButton() {
+      playPauseBtn.innerHTML = isPlaying
+        ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+    }
+
+    function prevSong() {
+      currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+      loadSong(currentSongIndex);
+      if (isPlaying) playSong();
+    }
+
+    function nextSong() {
+      currentSongIndex = (currentSongIndex + 1) % songs.length;
+      loadSong(currentSongIndex);
+      if (isPlaying) playSong();
+    }
+
+    function updateProgress() {
+      const { duration, currentTime } = audio;
+      const progressPercent = (currentTime / duration) * 100;
+      progress.style.width = `${progressPercent}%`;
+      
+      const formatTime = (time) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      };
+      
+      currentTimeElement.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+    }
+
+    function highlightActiveSong() {
+      const songItems = songList.getElementsByClassName('song-item');
+      for (let i = 0; i < songItems.length; i++) {
+        songItems[i].classList.remove('active-song');
+        if (i === currentSongIndex) {
+          songItems[i].classList.add('active-song');
+        }
+      }
+    }
+
+    function startEqualizer() {
+      const eqBars = equalizer.getElementsByClassName('eq-bar');
+      for (let i = 0; i < eqBars.length; i++) {
+        animateEqBar(eqBars[i]);
+      }
+    }
+
+    function stopEqualizer() {
+      const eqBars = equalizer.getElementsByClassName('eq-bar');
+      for (let i = 0; i < eqBars.length; i++) {
+        eqBars[i].style.height = '5px';
+      }
+    }
+
+    function animateEqBar(bar) {
+      const height = Math.random() * 45 + 5;
+      const duration = Math.random() * 0.3 + 0.2;
+      bar.style.height = `${height}px`;
+      bar.style.transition = `height ${duration}s ease`;
+      setTimeout(() => animateEqBar(bar), duration * 1000);
+    }
+
+    // Event Listeners
+    playPauseBtn.addEventListener('click', () => isPlaying ? pauseSong() : playSong());
+    prevBtn.addEventListener('click', prevSong);
+    nextBtn.addEventListener('click', nextSong);
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('ended', nextSong);
+
+    volumeSlider.addEventListener('input', (e) => {
+      audio.volume = e.target.value;
+    });
+
+    // Populate song list
+    songs.forEach((song, index) => {
+      const li = document.createElement('div');
+      li.classList.add('song-item');
+      li.textContent = song.title;
+      li.addEventListener('click', () => {
+        currentSongIndex = index;
+        loadSong(currentSongIndex);
+        playSong();
+      });
+      songList.appendChild(li);
+    });
+
+    // Initial load
+    loadSong(currentSongIndex);
+  </script>
+</body></html>
